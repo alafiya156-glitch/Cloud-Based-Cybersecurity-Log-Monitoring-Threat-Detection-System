@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Threat Alerts · Cloud Security Monitor{% endblock %}
+{% block page_title %}Threat alerts{% endblock %}
+{% block content %}
+<div class="page-intro"><p>Review suspicious patterns and update investigation status.</p><span class="live-pill"><span class="dot"></span> REFRESHES EVERY 3 SECONDS</span></div>
+<div class="callout">Alerts are rule-based indicators. Investigate the associated events before concluding that an attack occurred.</div>
+<div class="table-wrap"><table><thead><tr><th>Time</th><th>Severity</th><th>Alert</th><th>Source IP</th><th>Details</th><th>Status</th><th>Update</th></tr></thead><tbody id="alerts-body"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const body=document.getElementById('alerts-body');
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function changeStatus(id,status){await fetch(`/api/alerts/${id}/status`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});refresh();}
+async function refresh(){try{const r=await fetch('/api/alerts');if(!r.ok)return;const rows=await r.json();body.innerHTML=rows.length?rows.map(a=>`<tr><td>${esc(a.timestamp)}</td><td><span class="badge ${a.severity.toLowerCase()}">${esc(a.severity)}</span></td><td>${esc(a.alert_type)}</td><td>${esc(a.source_ip)}</td><td class="message-cell">${esc(a.details)}</td><td>${esc(a.status)}</td><td><select aria-label="Update alert ${a.id}" onchange="changeStatus(${a.id},this.value)"><option ${a.status==='Open'?'selected':''}>Open</option><option ${a.status==='Investigating'?'selected':''}>Investigating</option><option ${a.status==='Resolved'?'selected':''}>Resolved</option></select></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No alerts recorded yet.</td></tr>';}catch(e){}}
+refresh();setInterval(refresh,3000);
+</script>
+{% endblock %}

@@ -1,0 +1,121 @@
+
+{% extends "base.html" %}
+{% block title %}Dashboard · Cloud Security Monitor{% endblock %}
+{% block page_title %}Security overview{% endblock %}
+
+{% block content %}
+
+<div class="status-banner" id="status-banner" aria-live="polite">
+  <div class="status-symbol" id="status-symbol">◌</div>
+  <div>
+    <span class="eyebrow">CURRENT SYSTEM STATUS</span>
+    <h2 id="security-status">Checking monitoring status…</h2>
+    <p id="status-detail">Waiting for the latest event and alert counts.</p>
+  </div>
+  <span class="live-pill"><span class="dot"></span> LIVE MONITORING</span>
+</div>
+
+<div class="stat-grid">
+  <article class="stat-card total-card">
+    <div class="stat-label">Total events</div>
+    <div class="stat-value" id="total-events">—</div>
+    <div class="stat-foot">Recorded security events</div>
+  </article>
+
+  <article class="stat-card success-card">
+    <div class="stat-label">Successful logins</div>
+    <div class="stat-value" id="successful-logins">—</div>
+    <div class="stat-foot">Successful authentication events</div>
+  </article>
+
+  <article class="stat-card failed-card">
+    <div class="stat-label">Failed logins</div>
+    <div class="stat-value" id="failed-logins">—</div>
+    <div class="stat-foot">Authentication failures recorded</div>
+  </article>
+
+  <article class="stat-card alert-card">
+    <div class="stat-label">Open alerts</div>
+    <div class="stat-value" id="open-alerts">—</div>
+    <div class="stat-foot">Alerts requiring review</div>
+  </article>
+</div>
+
+<div class="chart-grid">
+  <section class="info-card chart-card">
+    <div class="chart-heading">
+      <div>
+        <span class="eyebrow">AUTHENTICATION ANALYTICS</span>
+        <h3>Login activity</h3>
+      </div>
+      <span class="chart-indicator">LIVE DATA</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="loginChart" aria-label="Successful versus failed login counts"></canvas>
+    </div>
+  </section>
+
+  <section class="info-card chart-card">
+    <div class="chart-heading">
+      <div>
+        <span class="eyebrow">EVENT ANALYTICS</span>
+        <h3>Security event distribution</h3>
+      </div>
+      <span class="chart-indicator">LIVE DATA</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="eventChart" aria-label="Distribution of security events"></canvas>
+    </div>
+  </section>
+</div>
+
+<div class="section-heading">
+  <div>
+    <span class="eyebrow">ACTIVITY STREAM</span>
+    <h2>Recent security events</h2>
+  </div>
+  <a class="text-link" href="{{ url_for('events_page') }}">View all events →</a>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Source</th>
+        <th>Event</th>
+        <th>Username</th>
+        <th>Source IP</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody id="recent-events">
+      <tr><td colspan="6" class="empty">Loading events…</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="bottom-grid">
+  <section class="info-card">
+    <span class="eyebrow">HOW TO TEST</span>
+    <h3>Generate demo activity</h3>
+    <p>Open the demo website login and submit incorrect credentials five times from the same IP within two minutes to test alert generation.</p>
+    <a class="button button-secondary"
+       href="{{ url_for('demo_login') }}"
+       target="_blank"
+       rel="noopener noreferrer">Open demo login ↗</a>
+  </section>
+
+  <section class="info-card">
+    <span class="eyebrow">DETECTION RULE</span>
+    <h3>Repeated failed logins</h3>
+    <p>Five or more failed logins from one source IP within two minutes create a high-priority alert. This is a suspicious pattern, not proof of an attack.</p>
+  </section>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

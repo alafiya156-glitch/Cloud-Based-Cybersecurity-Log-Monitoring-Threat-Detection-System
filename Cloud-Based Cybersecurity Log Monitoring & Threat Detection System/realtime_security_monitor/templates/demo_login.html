@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo Website Login · Security Monitor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="demo-wrap">
+  <div class="demo-card"><a href="{{ url_for('dashboard') }}" class="text-link">← Back to dashboard</a><span class="eyebrow">MONITORED APPLICATION</span><h1>Demo website login</h1><p class="muted">This separate demo login records successful and failed attempts so you can test application-level monitoring.</p>
+    {% if result %}<div class="result-box {{ 'success' if success else 'error' }}">{{ result }}</div>{% endif %}
+    <form method="post" class="form"><label for="username">Username</label><input id="username" name="username" required><label for="password">Password</label><input id="password" name="password" type="password" required><button class="button button-primary full" type="submit">Test login</button></form>
+    <div class="demo-hint"><strong>Demo account</strong><br>Username: <code>demo</code><br>Password: <code>DemoPass123!</code><p>Use wrong passwords five times to test alert generation.</p></div>
+  </div>
+</div>
+</body>
+</html>

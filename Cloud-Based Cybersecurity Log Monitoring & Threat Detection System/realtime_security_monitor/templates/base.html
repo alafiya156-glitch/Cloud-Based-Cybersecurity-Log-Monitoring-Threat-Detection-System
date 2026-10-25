@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Cloud Security Monitor{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% if session.get('admin_logged_in') %}
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-icon">◈</span><div><strong>SECURITY</strong><small>MONITOR</small></div></div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">▦ &nbsp; Dashboard</a>
+      <a href="{{ url_for('events_page') }}" class="{% if request.endpoint == 'events_page' %}active{% endif %}">≋ &nbsp; Live Events</a>
+      <a href="{{ url_for('alerts_page') }}" class="{% if request.endpoint == 'alerts_page' %}active{% endif %}">⚑ &nbsp; Threat Alerts</a>
+      <a href="{{ url_for('demo_login') }}" target="_blank">↗ &nbsp; Demo Website Login</a>
+      <a href="{{ url_for('analytics_page') }}">▥ &nbsp; Analytics</a>
+      <a href="{{ url_for('attack_map_page') }}">◎ &nbsp; Attack Map</a>
+      <a href="{{ url_for('simulate_page') }}">⚙ &nbsp; Safe Simulation</a>
+      <a href="{{ url_for('blocklist_page') }}">⊘ &nbsp; IP Block Simulation</a>
+      <a href="{{ url_for('incidents_page') }}">▤ &nbsp; Incidents & Audit</a>
+      <a href="{{ url_for('report_pdf') }}">⇩ &nbsp; PDF Report</a>
+    </nav>
+    <div class="side-bottom"><span class="dot green"></span> Application running</div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><span class="eyebrow">SECURITY OPERATIONS</span><h1>{% block page_title %}Overview{% endblock %}</h1></div>
+      <div class="user-area"><span class="avatar">A</span><span>{{ session.get('admin_username', 'admin') }}</span>
+        <form action="{{ url_for('logout') }}" method="post"><button class="button button-quiet" type="submit">Log out</button></form>
+      </div>
+    </header>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}
+{% block public_content %}{% endblock %}
+{% endif %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

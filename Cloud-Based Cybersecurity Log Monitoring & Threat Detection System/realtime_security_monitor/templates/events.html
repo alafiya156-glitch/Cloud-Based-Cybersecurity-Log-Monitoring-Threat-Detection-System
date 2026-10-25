@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Live Events · Cloud Security Monitor{% endblock %}
+{% block page_title %}Live security events{% endblock %}
+{% block content %}
+<div class="page-intro"><p>Recent events collected by the application and Ubuntu collector.</p><span class="live-pill"><span class="dot"></span> REFRESHES EVERY 3 SECONDS</span></div>
+<div class="toolbar"><label for="event-filter">Filter events</label><select id="event-filter"><option value="all">All events</option><option value="failed_login">Failed logins</option><option value="successful_login">Successful logins</option><option value="suspicious">Suspicious events</option></select><input id="event-search" placeholder="Search username, IP, source…" aria-label="Search events"></div>
+<div class="table-wrap"><table><thead><tr><th>Time</th><th>Source</th><th>Event</th><th>Username</th><th>Source IP</th><th>Message</th><th>Flag</th></tr></thead><tbody id="events-body"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const body=document.getElementById('events-body'), filter=document.getElementById('event-filter'), search=document.getElementById('event-search');
+let eventRows=[];
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function render(){const q=search.value.toLowerCase();let rows=eventRows.filter(e=>(filter.value==='all'||(filter.value==='suspicious'?e.suspicious: e.event_type===filter.value))&&JSON.stringify(e).toLowerCase().includes(q));
+body.innerHTML=rows.length?rows.map(e=>`<tr><td>${esc(e.timestamp)}</td><td>${esc(e.source)}</td><td>${esc(e.event_type)}</td><td>${esc(e.username)}</td><td>${esc(e.source_ip)}</td><td class="message-cell">${esc(e.message)}</td><td>${e.suspicious?'<span class="badge high">Suspicious</span>':'<span class="badge neutral">Recorded</span>'}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">No matching events.</td></tr>';}
+async function refresh(){try{const r=await fetch('/api/events?limit=200');if(r.ok){eventRows=await r.json();render();}}catch(e){}}
+filter.addEventListener('change',render);search.addEventListener('input',render);refresh();setInterval(refresh,3000);
+</script>
+{% endblock %}
